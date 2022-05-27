@@ -2,7 +2,7 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-### Hosted at: [https://csv-data-table.surge.sh/](<(https://github.com/facebook/create-react-app)>)
+Hosted at: [https://csv-data-table.surge.sh/](https://csv-data-table.surge.sh)
 
 ## Available Scripts
 
