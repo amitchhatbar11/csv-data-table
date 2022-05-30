@@ -30,54 +30,56 @@ function App() {
     filters.forEach((filter) => {
       data = [...data]
       const filteringValue =
-        filter.type === 'text' ? filter.value.toLowerCase() : filter.value
+        filter.type === 'string' ? filter.value.toLowerCase() : filter.value
 
       if (filteringValue) {
         switch (filter.condition) {
           case 'contains':
-            data = data
-              .filter((row) =>
-                filter.column === 'name'
-                  ? row['first_name'].toLowerCase().includes(filteringValue) ||
-                    row['last_name'].toLowerCase().includes(filteringValue)
-                  : row[filter.column].toLowerCase().includes(filteringValue)
-              )
-              .map((item) => item)
+            data =
+              data
+                .filter((row) =>
+                  row[filter.column].toLowerCase().includes(filteringValue)
+                )
+                .map((item) => item) || []
+
             break
 
           case 'notContains':
-            data = data
-              .filter((row) =>
-                filter.column === 'name'
-                  ? !row['first_name'].toLowerCase().includes(filteringValue) ||
-                    !row['last_name'].toLowerCase().includes(filteringValue)
-                  : !row[filter.column].toLowerCase().includes(filteringValue)
-              )
-              .map((item) => item)
+            data =
+              data
+                .filter(
+                  (row) =>
+                    !row[filter.column].toLowerCase().includes(filteringValue)
+                )
+                .map((item) => item) || []
             break
 
           case 'equalTo':
-            data = data
-              .filter((row) => row[filter.column] === Number(filteringValue))
-              .map((item) => item)
+            data =
+              data
+                .filter((row) => row[filter.column] === Number(filteringValue))
+                .map((item) => item) || []
             break
 
           case 'notEqualTo':
-            data = data
-              .filter((row) => row[filter.column] !== Number(filteringValue))
-              .map((item) => item)
+            data =
+              data
+                .filter((row) => row[filter.column] !== Number(filteringValue))
+                .map((item) => item) || []
             break
 
           case 'greaterThan':
-            data = data
-              .filter((row) => row[filter.column] > Number(filteringValue))
-              .map((item) => item)
+            data =
+              data
+                .filter((row) => row[filter.column] > Number(filteringValue))
+                .map((item) => item) || []
             break
 
           case 'lessThan':
-            data = data
-              .filter((row) => row[filter.column] < Number(filteringValue))
-              .map((item) => item)
+            data =
+              data
+                .filter((row) => row[filter.column] < Number(filteringValue))
+                .map((item) => item) || []
             break
 
           default:
@@ -95,38 +97,28 @@ function App() {
     )
   }, [filters])
 
-  const columns = useMemo(
-    () => [
-      {
-        Header: 'ID',
-        accessor: 'id'
-      },
-      {
-        Header: 'Name',
-        Cell: (row) => {
-          return (
-            <span>{`${row.row.original.first_name} ${row.row.original.last_name}`}</span>
-          )
-        }
-      },
-      {
-        Header: 'Email',
-        accessor: 'email'
-      },
-      {
-        Header: 'Spend',
-        accessor: 'price'
-      },
-      {
-        Header: 'Total Spend',
-        accessor: 'total_spend'
-      }
-    ],
-    []
-  )
+  const headers = Object.keys(Object.assign({}, ...csvData))
+  let typesOfColumns =
+    csvData.length &&
+    Object.entries(csvData[1]).map(([key, value]) => {
+      return { key, type: typeof value }
+    })
+
+  const tableColumns = headers.map((header) => {
+    return { Header: header.replace(/_/g, ' '), accessor: header }
+  })
+
+  const columns = useMemo(() => tableColumns, [tableColumns])
 
   return (
     <div className="px-4 py-4 sm:px-6 lg:px-8 space-y-3">
+      <div className="mb-4">
+        <div className="font-bold text-2xl">Import data</div>
+        <div className="text-sm text-gray-700">
+          Click the button below to upload your users from csv file. Each column
+          of the first row in this file should be the keys.
+        </div>
+      </div>
       <CSVReader
         cssClass="react-csv-input"
         label=""
@@ -134,7 +126,21 @@ function App() {
         parserOptions={papaparseOptions}
       />
 
-      {fileInfo !== {} && <FilterComponent setFilters={setFilters} />}
+      <div className="py-8 space-y-2">
+        <div className="font-bold text-2xl">View Users</div>
+        <div className="text-sm text-gray-700">
+          You can view and filter your users based on any criteria you set using
+          filters below
+        </div>
+
+        {fileInfo !== {} && (
+          <FilterComponent
+            setFilters={setFilters}
+            headers={tableColumns}
+            typesOfColumns={typesOfColumns}
+          />
+        )}
+      </div>
 
       <Table columns={columns} data={csvData} />
     </div>

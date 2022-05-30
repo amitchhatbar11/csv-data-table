@@ -1,32 +1,39 @@
 import { useState } from 'react'
 
-const FilterComponent = ({ setFilters }) => {
+const FilterComponent = ({ setFilters, headers, typesOfColumns }) => {
   const [list, setList] = useState([])
 
   const addFilter = () => {
     const key = {
       key: Date.now(),
-      column: 'name',
-      condition: 'contains',
-      type: 'text',
+      column: '',
+      type:
+        typesOfColumns?.find((type) => type.key === headers[0]?.accessor)
+          .type || '',
+      condition:
+        typesOfColumns?.find((type) => type.key === headers[0]?.accessor)
+          .type === 'string'
+          ? 'contains'
+          : 'equalTo',
       value: '',
-      options: [
-        { type: 'text', label: 'Name', value: 'name' },
-        { type: 'text', label: 'Email', value: 'email' },
-        { type: 'number', label: 'Spend', value: 'price' },
-        { type: 'number', label: 'Total Spend', value: 'total_spend' }
-      ],
+      options: headers.map((header) => {
+        return {
+          label: header.Header,
+          value: header.accessor,
+          type: typesOfColumns.find((type) => type.key === header.accessor).type
+        }
+      }),
       conditionOptions: [
-        { type: 'text', label: 'contains', value: 'contains' },
-        { type: 'text', label: 'does not Contains', value: 'notContains' },
+        { type: 'string', label: 'contains', value: 'contains' },
+        { type: 'string', label: 'does not contains', value: 'notContains' },
         {
           type: 'number',
-          label: 'is equal To',
+          label: 'is equal to',
           value: 'equalTo'
         },
-        { type: 'number', label: 'is not equal To', value: 'notEqualTo' },
-        { type: 'number', label: 'is greater Than', value: 'greaterThan' },
-        { type: 'number', label: 'is less Than', value: 'lessThan' }
+        { type: 'number', label: 'is not equal to', value: 'notEqualTo' },
+        { type: 'number', label: 'is greater than', value: 'greaterThan' },
+        { type: 'number', label: 'is less than', value: 'lessThan' }
       ]
     }
     setList([...list, key])
@@ -47,7 +54,7 @@ const FilterComponent = ({ setFilters }) => {
           item.type = item.options.find(
             (option) => option.value === itemColumn
           ).type
-          if (item.type === 'text') {
+          if (item.type === 'string') {
             item.condition = 'contains'
           } else {
             item.condition = 'equalTo'
@@ -97,7 +104,7 @@ const FilterComponent = ({ setFilters }) => {
       {list.map((item) => (
         <div className="flex space-x-3" key={item.key}>
           <select
-            className="form-select appearance-none block px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding bg-no-repeat border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+            className="form-select capitalize appearance-none block px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding bg-no-repeat border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
             aria-label="Default select example"
             value={item.column}
             onChange={(e) => columnValueChange(e, item.key)}
@@ -117,9 +124,9 @@ const FilterComponent = ({ setFilters }) => {
             onChange={(e) => conditionValueChange(e, item.key)}
           >
             <option disabled>Conditions</option>
-            {item.type === 'text'
+            {item.type === 'string'
               ? item.conditionOptions
-                  .filter((filterItem) => filterItem.type === 'text')
+                  .filter((filterItem) => filterItem.type === 'string')
                   .map((condOption) => (
                     <option key={condOption.value} value={condOption.value}>
                       {condOption.label}

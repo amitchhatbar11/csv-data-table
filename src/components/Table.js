@@ -42,7 +42,7 @@ function Table({ columns, data }) {
                     {headerGroup.headers.map((column) => (
                       <th
                         {...column.getHeaderProps()}
-                        className="px-3 py-4 text-left text-sm font-bold text-gray-900"
+                        className="px-3 py-4 text-left text-sm font-bold text-gray-900 capitalize"
                       >
                         {column.render('Header')}
                       </th>
@@ -135,7 +135,7 @@ function Table({ columns, data }) {
         </div>
       </div>
       {data.length === 0 && (
-        <div className="text-center m-10">Load User CSV data</div>
+        <div className="text-center m-10">Load CSV data</div>
       )}
     </div>
   )
